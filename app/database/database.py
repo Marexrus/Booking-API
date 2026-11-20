@@ -1,9 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-DATABASE_URL = "sqlite:///app/database/bookings.db"
+from app.core.config import settings
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(settings.DATABASE_URL, connect_args={"check_same_thread": False})
 
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
@@ -12,7 +12,7 @@ class Base(DeclarativeBase):
     pass
 
 
-def get_db():
+def get_session():
     db = SessionLocal()
     try:
         yield db
