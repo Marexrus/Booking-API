@@ -1,16 +1,13 @@
-from pydantic import BaseModel, field_serializer, Field
+from pydantic import BaseModel, field_serializer, Field, ConfigDict
+from typing import Literal
 from datetime import date, time
 
 class BookingCreate(BaseModel):
-    name: str
-    phone: str
+    name: str = Field(min_length=2, max_length=50)
+    phone: str = Field(pattern=r'^\+7\d{10}$')
     booking_date: date
     booking_time: time
     guests: int = Field(ge=1, le=10)
-
-    @field_serializer("booking_time")
-    def serialize_booking_time(self, value: time):
-        return value.strftime("%H:%M")
 
 class BookingOut(BaseModel):
     name: str
@@ -18,7 +15,6 @@ class BookingOut(BaseModel):
     booking_date: date
     booking_time: time
     guests: int
+    status: Literal['active', 'cancelled']
 
-    @field_serializer("booking_time")
-    def serialize_booking_time(self, value: time):
-        return value.strftime("%H:%M")
+    model_config = ConfigDict(from_attributes=True)
