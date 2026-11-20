@@ -1,16 +1,23 @@
-# This is a sample Python script.
+from contextlib import asynccontextmanager
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from fastapi import FastAPI
 
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+from app.database.database import engine, Base
+from app.database import models
+from app.routers.bookings import router
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+# создает таблицы и индексы до запуска приложения
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    Base.metadata.create_all(bind=engine)
+    yield
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
+app = FastAPI(lifespan=lifespan)
+app.include_router(router)
+
+
+@app.get("/")
+def home():
+    return {"message": "API is working"}
